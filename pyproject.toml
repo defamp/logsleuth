@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logsleuth"
+version = "1.0.0"
+description = "Log analyzer & detection engine for SOC / blue teams, mapped to MITRE ATT&CK."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "Defa Mulya Pratama" }]
+keywords = ["security", "soc", "blue-team", "detection", "mitre-attack", "log-analysis", "dfir"]
+dependencies = ["rich>=13.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+logsleuth = "logsleuth.cli:main"
+
+[tool.setuptools]
+packages = ["logsleuth", "logsleuth.parsers", "logsleuth.detectors"]
