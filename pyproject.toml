@@ -21,3 +21,9 @@ logsleuth = "logsleuth.cli:main"
 
 [tool.setuptools]
 packages = ["logsleuth", "logsleuth.parsers", "logsleuth.detectors"]
+
+[tool.ruff]
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

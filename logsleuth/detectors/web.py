@@ -26,7 +26,7 @@ _SENSITIVE_PATHS = re.compile(
 
 
 class WebAttackDetector(BaseDetector):
-    """Injection / exploitation signatures in request paths."""
+    """Injection / exploitation signatures in request paths and User-Agents."""
 
     name = "web_attack"
 
@@ -35,11 +35,15 @@ class WebAttackDetector(BaseDetector):
         for e in events:
             if e.kind is not EventKind.HTTP_REQUEST or not e.path:
                 continue
-            decoded = unquote(e.path)
+            # Payloads hide in the path (raw and URL-decoded) and in the
+            # User-Agent (e.g. Shellshock, stored XSS via log viewers).
+            targets = [e.path, unquote(e.path)]
+            if e.user_agent:
+                targets.append(e.user_agent)
+            # One request can carry several attack types; report each of them.
             for attack_name, pattern in _ATTACK_SIGNATURES:
-                if pattern.search(decoded) or pattern.search(e.path):
+                if any(pattern.search(t) for t in targets):
                     hits[(e.source_ip, attack_name)].append(e)
-                    break
 
         alerts: List[Alert] = []
         for (ip, attack_name), evs in hits.items():
