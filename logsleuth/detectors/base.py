@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Optional, Sequence
+from typing import List, Sequence
 
 from ..models import Alert, Event
 

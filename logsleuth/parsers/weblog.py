@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ipaddress
 import re
 from datetime import datetime
 from typing import Optional
@@ -11,7 +12,7 @@ from .base import BaseParser
 
 # 127.0.0.1 - - [10/Oct/2024:13:55:36 +0000] "GET /p HTTP/1.1" 200 1234 "ref" "ua"
 _COMBINED = re.compile(
-    r'(?P<ip>\d{1,3}(?:\.\d{1,3}){3})\s+\S+\s+\S+\s+'
+    r'^(?P<ip>[0-9A-Fa-f:.]+)\s+\S+\s+\S+\s+'
     r'\[(?P<ts>[^\]]+)\]\s+'
     r'"(?P<method>[A-Z]+)\s+(?P<path>\S+)\s+HTTP/[\d.]+"\s+'
     r'(?P<status>\d{3})\s+(?P<size>\S+)'
@@ -33,6 +34,10 @@ class WebLogParser(BaseParser):
     def parse_line(self, line: str) -> Optional[Event]:
         m = _COMBINED.search(line)
         if not m:
+            return None
+        try:
+            ipaddress.ip_address(m.group("ip"))  # IPv4 or IPv6
+        except ValueError:
             return None
         return Event(
             kind=EventKind.HTTP_REQUEST,

@@ -40,6 +40,9 @@ def build_parser() -> argparse.ArgumentParser:
                    default="low", help="only show alerts at/above this severity")
     p.add_argument("--bruteforce-threshold", type=int, default=10,
                    help="failed SSH logins per IP before alerting (default 10)")
+    p.add_argument("--year", type=int,
+                   help="year of the first syslog line (auth.log has no year; default: current "
+                        "year, rolling over at New Year)")
     p.add_argument("--no-color", action="store_true", help="disable coloured output")
     p.add_argument("-V", "--version", action="version", version=f"logsleuth {__version__}")
     return p
@@ -59,7 +62,7 @@ def main(argv=None) -> int:
     detectors = default_detectors()
     detectors[0] = SSHBruteForceDetector(threshold=args.bruteforce_threshold)
 
-    engine = Engine(detectors=detectors)
+    engine = Engine(detectors=detectors, year=args.year)
     events = engine.parse(lines)
     alerts = engine.detect(events)
     alerts = filter_min_severity(alerts, Severity(args.min_severity))

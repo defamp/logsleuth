@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Iterable, List, Sequence
+from typing import Iterable, List, Optional, Sequence
 
 from .detectors import default_detectors
 from .detectors.base import BaseDetector
@@ -11,7 +11,7 @@ from .parsers import AuthLogParser, WebLogParser
 
 
 class Engine:
-    def __init__(self, detectors: Sequence[BaseDetector] = None, year: int = 2024):
+    def __init__(self, detectors: Sequence[BaseDetector] = None, year: Optional[int] = None):
         self.detectors = list(detectors) if detectors is not None else default_detectors()
         self.parsers = [AuthLogParser(year=year), WebLogParser()]
 
